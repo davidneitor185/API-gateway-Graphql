@@ -1,5 +1,8 @@
+const axios = require("axios");
 const fetch = require("node-fetch");
 const { ApolloServer, gql } = require("apollo-server");
+const { METHODS } = require("http");
+const url1 = "http://localhost:5000/";
 
 
 const typeDefs = gql`
@@ -50,7 +53,17 @@ const typeDefs = gql`
     updatesolicitud(
       id_solicitud: ID
       estado: String
-    )
+    ): Solicitud
+    postsolicitud(
+      id_funcionario: Int
+      justificacion: String
+      tiempo_e: String            
+    ): Solicitud
+    postelement(
+      nombre: String
+      cantidad: Int
+      id_solicitud: Int        
+    ): Elemento
   }
 `;
 
@@ -64,6 +77,11 @@ const resolvers = {
       findsolicitud: (root, args) => fetchSolicitud(args),
       findelementos: (root, args) => fetchElementos(args),
     },
+    Mutation: {
+      updatesolicitud: (root, args) => updateSoli(args),
+      postsolicitud: (root, args) => postSoli(args),
+      postelement: (root, args) => postElement(args),
+    }
   };
 
 
@@ -76,8 +94,8 @@ server.listen().then(({ url }) => {
 
 function fetchUser(args) {
   let {email, contrasena} = args;
-  let url = "http://localhost:5000/cuenta/" + email + "/" + contrasena;
-  return fetch(url)
+  let link = url1 + "cuenta/" + email + "/" + contrasena;
+  return fetch(link)
     .then(res => res.json())
     .then(json => {
       let user= json;
@@ -100,8 +118,8 @@ function fetchUser(args) {
 }
 
 function fetchSolicitudes() {  
-    let url = "http://localhost:5000/solicitudes";
-  return fetch(url)
+    let link = url1 + "solicitudes";
+  return fetch(link)
     .then(res => res.json())
     .then(json => {
       let solicitudes = json;      
@@ -112,8 +130,8 @@ function fetchSolicitudes() {
 
 function fetchSolicitud(args) {  
   let {id_solicitud} = args;
-  let url = "http://localhost:5000/solicitud/" + id_solicitud ;
-return fetch(url)
+  let link = url1 + "solicitud/" + id_solicitud ;
+return fetch(link)
   .then(res => res.json())
   .then(json => {
     let solicitud = json[0];      
@@ -124,12 +142,55 @@ return fetch(url)
 
 function fetchElementos(args) {  
   let {id_solicitud} = args;
-  let url = "http://localhost:5000/elemento/" + id_solicitud ;
-return fetch(url)
+  let link = url1 + "elemento/" + id_solicitud ;
+return fetch(link)
   .then(res => res.json())
   .then(json => {
     let elementos = json;      
-    console.log(json);
+    //console.log(json);
     return elementos;
   });
+}
+
+function updateSoli(args) {  
+  let {id_solicitud, estado} = args;
+  let link = url1 + "updatesolicitud/" + id_solicitud + "/" + estado ;
+  console.log(link);
+return fetch(link, {
+  method: 'PUT'
+})
+  .then(res => res.json())
+  .then(json => {
+    let elementos = json;      
+    
+    return elementos;
+  });
+}
+function postSoli(args) {  
+  let {id_funcionario, justificacion, tiempo_e} = args;
+  let link = url1 + "postsolicitud";
+  let body1 = {    
+      "id_funcionario": id_funcionario,
+      "justificacion": justificacion,
+      "tiempo_e": tiempo_e,
+      "estado": "Diligenciada"
+  }
+  return axios.post(link, body1).then(function(res) {    
+    console.log(res.data[0]);
+    return res.data[0];
+  });  
+}
+
+function postElement(args) {  
+  let {nombre, cantidad, id_solicitud} = args;
+  let link = url1 + "postelement";
+  let body1 = {
+    "nombre": nombre,
+    "cantidad": cantidad,
+    "id_solicitud": id_solicitud
+  }
+  return axios.post(link, body1).then(function(res) {    
+    console.log(res.data[0]);
+    return res.data[0];
+  });  
 }

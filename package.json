@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^3.6.1",
+    "axios": "^0.26.1",
     "graphql": "^16.2.0",
     "knex": "^0.95.15",
     "node-fetch": "^2.6.0",
