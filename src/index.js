@@ -45,6 +45,13 @@ const typeDefs = gql`
     findsolicitud(id_solicitud: Int): Solicitud 
     findelementos(id_solicitud: Int): [Elemento]
   }
+
+  type Mutation {
+    updatesolicitud(
+      id_solicitud: ID
+      estado: String
+    )
+  }
 `;
 
 
